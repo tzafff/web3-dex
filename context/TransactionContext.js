@@ -165,6 +165,18 @@ export const TransactionProvider = ({children}) => {
 
         return
     }
+
+    // Trigger loading modal
+    useEffect(() => {
+        if(isLoading) {
+            router.push(`/?loading=${currentAccount}`)
+        } else {
+            router.push(`/`)
+        }
+
+    }, [isLoading]);
+
+
     return (
         <TransactionContext.Provider
             value={{
