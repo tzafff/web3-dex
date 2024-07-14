@@ -1,10 +1,17 @@
-import { useEffect, useState } from 'react'
-import {client} from '@/sanity/lib/client'
-import { useContext } from 'react'
-import { TransactionContext } from '../context/TransactionContext'
-import Image from 'next/image'
-import ethLogo from '../assets/ethCurrency.png'
-import { FiArrowUpRight } from 'react-icons/fi'
+import { useEffect, useState } from 'react';
+import { client } from '@/sanity/lib/client';
+import { useContext } from 'react';
+import { TransactionContext } from '../context/TransactionContext';
+import Image from 'next/image';
+import ethLogo from '../assets/ethCurrency.png';
+import { FiArrowUpRight } from 'react-icons/fi';
+
+interface Transaction {
+    amount: number;
+    toAddress: string;
+    timestamp: string; // Assuming timestamp is a string, adjust type if it's different
+    txHash: string;
+}
 
 const style = {
     wrapper: `h-full text-white select-none h-full w-screen flex-1 pt-14 flex items-end justify-end pb-12 overflow-scroll px-8`,
@@ -16,9 +23,8 @@ const style = {
 }
 
 const TransactionHistory = () => {
-
-    const { isLoading, currentAccount} = useContext(TransactionContext);
-    const [transactionHistory, setTransactionHistory] = useState([]);
+    const { isLoading, currentAccount } = useContext(TransactionContext);
+    const [transactionHistory, setTransactionHistory] = useState<Transaction[]>([]); // Specify the type here
 
     useEffect(() => {
         ;(async () => {
@@ -27,53 +33,52 @@ const TransactionHistory = () => {
                   *[_type=="users" && _id == "${currentAccount}"] {
                     "transactionList": transactions[]->{amount, toAddress, timestamp, txHash}|order(timestamp desc)[0..4]
                   }
-                `
-                const clientRes = await client.fetch(query)
-                console.log(clientRes)
+                `;
+                const clientRes = await client.fetch(query);
+                console.log(clientRes);
 
-                setTransactionHistory(clientRes[0].transactionList)
+                setTransactionHistory(clientRes[0].transactionList);
             }
-        })()
-    }, [isLoading, currentAccount])
-
+        })();
+    }, [isLoading, currentAccount]);
 
     return (
         <div className={style.wrapper}>
             <div>
-                {transactionHistory &&
-                    transactionHistory?.map((transaction, index) => (
-                        <div className={style.txHistoryItem} key={index}>
-                            <div className={style.txDetails}>
-                                <Image src={ethLogo} height={20} width={15} alt='eth' />
-                                {transaction.amount} Ξ sent to{' '}
-                                <span className={style.toAddress}>
-                  {transaction.toAddress.substring(0, 6)}...
-                </span>
-                            </div>{' '}
-                            on{' '}
-                            <div className={style.txTimestamp}>
-                                {new Date(transaction.timestamp).toLocaleString('en-US', {
-                                    timeZone: 'PST',
-                                    hour12: true,
-                                    timeStyle: 'short',
-                                    dateStyle: 'long',
-                                })}
-                            </div>
-                            <div className={style.etherscanLink}>
-                                <a
-                                    href={`https://sepolia.etherscan.io/tx/${transaction.txHash}`}
-                                    target='_blank'
-                                    rel='noreferrer'
-                                    className={style.etherscanLink}
-                                >
-                                    View on Etherscan
-                                    <FiArrowUpRight />
-                                </a>
-                            </div>
+                {transactionHistory.map((transaction, index) => (
+                    <div className={style.txHistoryItem} key={index}>
+                        <div className={style.txDetails}>
+                            <Image src={ethLogo} height={20} width={15} alt='eth' />
+                            {transaction.amount} Ξ sent to{' '}
+                            <span className={style.toAddress}>
+                                {transaction.toAddress.substring(0, 6)}...
+                            </span>
+                        </div>{' '}
+                        on{' '}
+                        <div className={style.txTimestamp}>
+                            {new Date(transaction.timestamp).toLocaleString('en-US', {
+                                timeZone: 'PST',
+                                hour12: true,
+                                timeStyle: 'short',
+                                dateStyle: 'long',
+                            })}
                         </div>
-                    ))}
+                        <div className={style.etherscanLink}>
+                            <a
+                                href={`https://sepolia.etherscan.io/tx/${transaction.txHash}`}
+                                target='_blank'
+                                rel='noreferrer'
+                                className={style.etherscanLink}
+                            >
+                                View on Etherscan
+                                <FiArrowUpRight />
+                            </a>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
-    )
-}
-export default TransactionHistory
+    );
+};
+
+export default TransactionHistory;

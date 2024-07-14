@@ -7,6 +7,7 @@ import Modal from 'react-modal';
 import { useRouter } from 'next/router'
 import {TransactionContext} from "@/context/TransactionContext";
 import TransactionLoader from "@/components/TransactionLoader";
+import { FormEvent, MouseEvent } from 'react'; // Import necessary event types
 
 Modal.setAppElement('#__next')
 
@@ -45,13 +46,13 @@ const Main = () => {
         useContext(TransactionContext)
     const router = useRouter()
 
-    const handleSubmit = async (e) => {
-        const { addressTo, amount } = formData
-        e.preventDefault()
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const { addressTo, amount } = formData;
 
-        if(!addressTo || !amount) return
+        if (!addressTo || !amount) return;
 
-        sendTransaction()
+        sendTransaction();
     }
 
     return (
@@ -63,41 +64,43 @@ const Main = () => {
                         <RiSettings3Fill />
                     </div>
                 </div>
-                <div className={style.transferPropContainer}>
-                    <input
-                        type="text"
-                        className={style.transferPropInput}
-                        placeholder='0.0'
-                        pattern='^[0-9]*[.,]?[0-9]*$'
-                        onChange={e => handleChange(e, 'amount')}
-                    />
-                    <div className={style.currencySelector}>
-                        <div className={style.currencySelectorContent}>
-                            <div className={style.currencySelectorIcon}>
-                                <Image src={ethLogo} alt="eth logo" height={20} />
+                <form onSubmit={handleSubmit}> {/* Use onSubmit for form submission */}
+                    <div className={style.transferPropContainer}>
+                        <input
+                            type="text"
+                            className={style.transferPropInput}
+                            placeholder='0.0'
+                            pattern='^[0-9]*[.,]?[0-9]*$'
+                            onChange={e => handleChange(e, 'amount')}
+                        />
+                        <div className={style.currencySelector}>
+                            <div className={style.currencySelectorContent}>
+                                <div className={style.currencySelectorIcon}>
+                                    <Image src={ethLogo} alt="eth logo" height={20} />
+                                </div>
+                                <div className={style.currencySelectorTicker}>ETH</div>
+                                <AiOutlineDown className={style.currencySelectorArrow} />
                             </div>
-                            <div className={style.currencySelectorTicker}>ETH</div>
-                            <AiOutlineDown className={style.currencySelectorArrow} />
                         </div>
                     </div>
-                </div>
-                <div className={style.transferPropContainer}>
-                    <input
-                        type="text"
-                        className={style.transferPropInput}
-                        placeholder="0x..."
-                        onChange={(e) => handleChange(e, 'addressTo')}
-                    />
-                    <div className={style.currencySelector}></div>
-                    <div onClick={e => handleSubmit(e)} className={style.confirmButton}>
-                        Confirm
+                    <div className={style.transferPropContainer}>
+                        <input
+                            type="text"
+                            className={style.transferPropInput}
+                            placeholder="0x..."
+                            onChange={(e) => handleChange(e, 'addressTo')}
+                        />
+                        <div className={style.currencySelector}></div>
+                        <button type="submit" className={style.confirmButton}> {/* Use button for submission */}
+                            Confirm
+                        </button>
                     </div>
-                </div>
+                </form>
             </div>
             <Modal isOpen={!! router.query.loading} style={customStyles}>
                 <TransactionLoader />
             </Modal>
         </div>
-    )
+    );
 }
 export default Main

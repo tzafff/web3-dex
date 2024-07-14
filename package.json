@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@sanity/image-url": "^1.0.2",
     "@sanity/vision": "^3.50.0",
     "ethers": "^5.5.4",
