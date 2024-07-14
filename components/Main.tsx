@@ -5,6 +5,7 @@ import ethLogo from '../assets/eth.png'
 import { useContext } from 'react'
 // import Modal from 'react-modal'
 import { useRouter } from 'next/router'
+import {TransactionContext} from "@/context/TransactionContext";
 
 const style = {
     wrapper: `w-screen flex items-center justify-center mt-14`,
@@ -21,6 +22,19 @@ const style = {
 }
 
 const Main = () => {
+    const { formData, handleChange, sendTransaction } =
+        useContext(TransactionContext)
+    const router = useRouter()
+
+    const handleSubmit = async (e) => {
+        const { addressTo, amount } = formData
+        e.preventDefault()
+
+        if(!addressTo || !amount) return
+
+        sendTransaction()
+    }
+
     return (
         <div className={style.wrapper}>
             <div className={style.content}>
